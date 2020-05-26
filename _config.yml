@@ -1,11 +1,11 @@
 # Site settings
 author: Patrick Rush
-title: 
+title: Rush Code
 header-img: img/home-bg.png
 email: patrick.a.rush@gmail.com
 copyright_name: Patrick Rush
 description: > # this means to ignore newlines until "baseurl:"
-  
+  my journey into the world of software engineering 
 baseurl: "" # the subpath of your site, e.g. /blog
 twitter_username: 
 github_username:  patrick-rush
