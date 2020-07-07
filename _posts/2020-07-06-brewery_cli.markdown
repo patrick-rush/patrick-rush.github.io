@@ -1,0 +1,19 @@
+---
+layout: post
+title:      "Brewery CLI"
+date:       2020-07-07 02:52:30 +0000
+permalink:  brewery_cli
+---
+
+
+Six weeks have gone by fast. I'm at the end of the first part of my Flatiron journey, and I feel great so far! The final requirement for the first unit is to create a CLI program that draws data from an external source, namely via an API or scraping. I found an API for breweries in the United States, and since I enjoy a good craft beer from time to time and I live in one of the top cities for craft beer in the world, I thought I'd build a program that helps users locate breweries to check out.
+
+When a user opens the program, they are asked to choose how they would like to search. The API I used ([Open Brewery DB](https://www.openbrewerydb.org/)) offers a few built in search methods that I took advantage of here (search by city, state, and zip code). So the user begins by selecting which method they would like to use to search for breweries. Once they've made their selection, they are asked to input a location, and then they are taken to a list of breweries for that location. They are then able to select one by entering its number in order to see its name, physical address, and phone number. If they want to see the details for another brewery in the list, they can just enter its number, or they can go back to the main menu to start a new search. At any point, they can quit the program by typing 'exit'.
+
+I faced a list of challenges while working on this program. I started out thinking I would have some interacting classes that allowed the user to narrow down all of the search results they had procured by brewery type, or some other characteristic, but I found it made the user interface a little too clunky (and the API lacked some of the relevant data I would have liked to use). I wanted it to be an easy to use program, and most of all, an intuitive interaction for the user. 
+
+By the end, the challenge that I faced was making sure the user could type 'exit' or 'menu' at any point in the program and be taken to the right place. On the surface it was quite easy, but where I ran into trouble was if the user first entered an invalid response to the menu that they were presented with, and then tried to go back to the main menu, or exit the program, the flow messed up. This taught me a lot about control flow and making sure I had a logical progression through the program.
+
+Additionally, since there were three different ways to search the database, I had a lot of code that ended up doing very similar things. I wanted to find a way to streamline the code so that one method could handle different types of requests while remaining DRY and without becoming too complicated. I achieved this by using a switch instance variable in my CLI class. When the user is searching the database via zip code, the switch is set to the number 1, so other methods in the CLI class know how to direct the user input (and 2 for city name, 3 for state, etc.). This allowed me to eliminate 20-30 lines of code.
+
+Perhaps the best part of building this program was becoming more confident in my ability to find the answers that I needed. Becoming familiar and comfortable with online resources is clearly such a big part of the skill set necessary for a successful programmer, so it is encouraging to see those skills develop before my eyes. And with that, unit one is complete! Onto the next!
