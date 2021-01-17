@@ -1,14 +1,14 @@
 ---
 layout: post
 title:      "In This Case, Failure Means Success"
-date:       2021-01-17 21:15:12 +0000
+date:       2021-01-17 16:15:13 -0500
 permalink:  in_this_case_failure_means_success
 ---
 
 
 Despite the profundity you may expect from a blog post with that title, I'm not here to spill any philosophical tea. What I'm really after is exploring this confounding error message that I kept seeing in the Chrome developers console throughout the development of my latest app:
 
-![X](https://imgur.com/GSeTAP5)
+![X](https://i.imgur.com/GSeTAP5.png)
 
 ```
 Fetch failed loading: DELETE "http://localhostL3000/care_events/30".
@@ -17,7 +17,7 @@ Fetch failed loading: DELETE "http://localhostL3000/care_events/30".
 
 When I first saw this error, I thought, "Hmm, I guess this fetch call isn't working. Maybe I provided the wrong API endpoint?" But when I popped over to the Rails console, I found this:
 
-![X](https://imgur.com/a/Tca7Wud)
+![X](https://i.imgur.com/Rt1H68q.png)
 
 So the item I was trying to delete was successfully destroyed. That's good news. In fact, this means that the error is insignificant and we *could* just ignore it. But I don't like errors showing up when everything is actually behaving well. I find them annoying, and if I get in the weeds with other errors, they can distract me from important information in the console.
 
