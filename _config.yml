@@ -18,3 +18,6 @@ paginate: 5
 exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
 
 gems: [jekyll-paginate, jekyll-feed]
+
+# Google Analytics
+google_analytics: UA—270225102
