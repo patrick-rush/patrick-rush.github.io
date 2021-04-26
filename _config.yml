@@ -20,4 +20,4 @@ exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
 gems: [jekyll-paginate, jekyll-feed]
 
 # Google Analytics
-google_analytics: G-L3DMEXT6YH
+google_analytics: UA-195470813-1
