@@ -1,0 +1,2 @@
+I"<p>While working on my latest project, an app for keeping track of when to take care of your houseplants, I wanted to make sure that I built the app in such a way that the user could link to specific parts of the app, even a specific plant’s information card. Additionally, they should be able to reload the page while viewing a specific plant or care event, and continue to see that plant or event when the page is done reloading. Seems easy enough. It became a bit of a headache though, so let me walk you through my final solution.</p>
+:ET

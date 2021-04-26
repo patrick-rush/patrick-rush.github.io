@@ -1,0 +1,65 @@
+I"� <p>While working on my latest project, an app for keeping track of when to take care of your houseplants, I wanted to make sure that I built the app in such a way that the user could link to specific parts of the app, even a specific plant’s information card. Additionally, they should be able to reload the page while viewing a specific plant or care event, and continue to see that plant or event when the page is done reloading. Seems easy enough. It became a bit of a headache though, so let me walk you through my final solution.</p>
+
+<p>First off, some context:</p>
+
+<p>I’ve got a React app using a Redux store, Thunk middlewear is handling fetch calls to my Rails API, and React Router DOM is taking care of the routing.</p>
+
+<p>Starting out in <code class="language-plaintext highlighter-rouge">App.js</code>,</p>
+
+<p><img src="https://i.imgur.com/pLihW1I.png" alt="app.js" /></p>
+
+<p>I’m importing <code class="language-plaintext highlighter-rouge">BrowserRouter</code> as <code class="language-plaintext highlighter-rouge">Router</code>, as well as <code class="language-plaintext highlighter-rouge">Switch</code> and <code class="language-plaintext highlighter-rouge">Route</code>. In this case, I have a separate functional component taking care of my Navbar which is hanging out right above the Switch.</p>
+
+<p>Now, if you’re building a hook based React application, the best way to handle nested routes is using the <a href="https://reactrouter.com/web/example/nesting"><code class="language-plaintext highlighter-rouge">useRouteMatch()</code></a> hook available from React Router DOM from which you can destructure <code class="language-plaintext highlighter-rouge">URL</code> and <code class="language-plaintext highlighter-rouge">path</code> variables to manage the nesting of routes. However, I’m working with class based React, and I have an app that is small enough that it seemed impractical to refactor just to accommodate nested routing. So this was my solution.</p>
+
+<p>When your router matches a specific path, it looks for one of three render methods: <code class="language-plaintext highlighter-rouge">component</code>, <code class="language-plaintext highlighter-rouge">render</code>, or <code class="language-plaintext highlighter-rouge">children</code>. They each function a little bit differently, but regardless of which you choose, you’ll get three built in props with each: <code class="language-plaintext highlighter-rouge">match</code>, <code class="language-plaintext highlighter-rouge">location</code>, and <code class="language-plaintext highlighter-rouge">history</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">history</code> will be used down the road for redirecting, but let’s look at <code class="language-plaintext highlighter-rouge">match</code>. <code class="language-plaintext highlighter-rouge">match</code> holds information about the current route including the path and url. It also includes any params present in the route.</p>
+
+<p>The router looks like this,</p>
+
+<p><img src="https://i.imgur.com/vKRkO9n.png" alt="router" /></p>
+
+<p>so when a user enters <code class="language-plaintext highlighter-rouge">http://reallycoolapp.com/plants/35</code>, <code class="language-plaintext highlighter-rouge">match</code> will look like this:</p>
+
+<p><img src="https://i.imgur.com/xPDrERE.png" alt="match" /></p>
+
+<p>So, with <code class="language-plaintext highlighter-rouge">match.params.plantId</code>, we get “35”! That’s what we need to find the correct plant and render it to the user!</p>
+
+<p>The path <code class="language-plaintext highlighter-rouge">"plants/:plantId"</code> renders the component <code class="language-plaintext highlighter-rouge">PlantPageContainer</code>, so let’s have a look at what happens when we get there.</p>
+
+<p>Originally, I was triggering a dispatch within the constructor that fetched all of the plants, and attaching a <code class="language-plaintext highlighter-rouge">.then</code> statement to handle fetching events and notes associated with that plant. I had seen that <code class="language-plaintext highlighter-rouge">componentDidMount()</code> was a good place for fetch calls, but was having trouble with having the fetch complete before my page tried to render. Afterall, it wasn’t fetching data until after the component mounted, which happens after <code class="language-plaintext highlighter-rouge">render</code>. This is what my constructor looked like:</p>
+
+<p><img src="https://i.imgur.com/FGtmvu6.png" alt="PlantPageContainer" /></p>
+
+<p>This obviously had a negative effect on performance, and just didn’t follow the convention that I was familiar with, but it took some time to figure out what the true culprit was for the errors I was getting, and it wasn’t what I expected.</p>
+
+<p>When I was building my reducers, I had set up an initial state that set the initial value of <code class="language-plaintext highlighter-rouge">currentPlant</code> to <code class="language-plaintext highlighter-rouge">null</code>. So, when components rendered, they tried to extract values from a non-existent object which raised errors. If I had instead defined that initial state as an empty object, no errors would be raised. Calling a key on an empty object just returns nothing. So, I went back and changed my reducer’s initial state to this:</p>
+
+<p><img src="https://i.imgur.com/Fwgg1x7.png" alt="initialState" /></p>
+
+<p>Now, I also used some logic in some of my container components to determine whether a plant was displayed or a welcome message. This logic broke when there was an empty object, so I defined a helper method that checks whether the <code class="language-plaintext highlighter-rouge">currentPlant</code> is an empty object or an actual plant instance.</p>
+
+<p><img src="https://i.imgur.com/zTBTbcW.png" alt="helper" /></p>
+
+<p>Now that all this is set up, we can dispatch fetch calls from <code class="language-plaintext highlighter-rouge">componentDidMount()</code> so that the component can render and then fill in with the information that is fetched.</p>
+
+<p>Now, the question of nested routing:</p>
+
+<p>So, in <code class="language-plaintext highlighter-rouge">componentDidMount()</code>, which now looks like this:</p>
+
+<p><img src="https://i.imgur.com/34mtnxi.png" alt="componentDidMount" /></p>
+
+<p>in order to appropriately respond to nested routes, after fetching all of the plants that need to show up in our sidebar (making sure to <strong>return</strong> our fetch call when it is defined), we throw on a <code class="language-plaintext highlighter-rouge">.then</code> statement, which is where we check to see if the <code class="language-plaintext highlighter-rouge">match</code> prop has any params. If it does, we’ll want to go find that plant in the store, set it to active, and fetch the notes and events associated with it. If there is no <code class="language-plaintext highlighter-rouge">plantId</code> in match, then we move along and simply render the welcome message along with the list of plants in the sidebar.</p>
+
+<p>So, to recap, in order to imitate the functionality of nested routes, we define a nested route in the <code class="language-plaintext highlighter-rouge">router</code> located in <code class="language-plaintext highlighter-rouge">App.js</code> using a colon to indicate that we’ll be passing a value through in that position, and we pass that route a component to render when it is matched. Then the component, which in this case is a container component for rendering plants, renders and dispatches the appropriate actions to fetch plants. In order to set the current plant that has been passed into the component via the url, we fetch all of the plants first so that when we dispatch this action:</p>
+
+<p><img src="https://i.imgur.com/Wo94fec.png" alt="action" /></p>
+
+<p>and then dispatch this case in <code class="language-plaintext highlighter-rouge">reducers/plants.js</code>:</p>
+
+<p><img src="https://i.imgur.com/l3rPfpf.png" alt="set_current_plant" /></p>
+
+<p>there are plants in the store to iterate over. This prevents us having to make another fetch call to the API just to retrieve this specific plant, which we already have the information for in the store. <a href="https://i.imgur.com/GhPJ3Ox.mp4">Here’s a short clip</a> demonstrating navigating directly to a specific plant via a nested route.</p>
+
+:ET

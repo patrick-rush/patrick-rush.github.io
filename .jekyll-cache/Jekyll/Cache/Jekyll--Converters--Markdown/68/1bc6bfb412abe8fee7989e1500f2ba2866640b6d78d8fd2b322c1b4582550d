@@ -1,0 +1,110 @@
+I"�,<p>I’ve just finished building my first Rails web application, a simple to-do app built for collaboration among friends. I faced a few interesting challenges along the way, but perhaps my favorite was when I decided to introduce a nested form. See, for the purposes of streamlining the relationships in this app, I wanted Projects and Users to only be related through Tasks. If a User has created a Task associated with a Project, that Project should then show up on their homepage. The problem arises, though, when a User creates a new Project that has no Tasks. So, to fix this, I made sure that new Projects were created with a new Task with the help of a nested form.</p>
+
+<p>Originally, I set things up like this:</p>
+
+<p>The nested form:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="sx">%= form_for @project do |f| %&gt;
+    &lt;%=</span> <span class="n">f</span><span class="p">.</span><span class="nf">label</span> <span class="ss">:title</span> <span class="o">%&gt;</span>
+    <span class="o">&lt;</span><span class="sx">%= f.text_field :title %&gt; &lt;br&gt;
+    &lt;%=</span> <span class="n">f</span><span class="p">.</span><span class="nf">label</span> <span class="ss">:private</span><span class="p">,</span> <span class="s2">"Private?"</span> <span class="o">%&gt;</span> 
+    <span class="o">&lt;</span><span class="sx">%= f.check_box :private, checked: false, unchecked: true %&gt; &lt;br&gt;
+
+    &lt;%=</span> <span class="n">f</span><span class="p">.</span><span class="nf">fields_for</span> <span class="ss">:tasks</span> <span class="k">do</span> <span class="o">|</span><span class="n">task</span><span class="o">|</span> <span class="sx">%&gt;
+        &lt;div&gt;</span><span class="no">Make</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">add</span> <span class="n">a</span> <span class="n">task</span> <span class="n">to</span> <span class="n">get</span> <span class="n">your</span> <span class="n">project</span> <span class="n">started!</span><span class="o">&lt;</span><span class="sr">/div&gt;
+        &lt;%= task.hidden_field :user_id, value: current_user.id %&gt;        
+        &lt;%= task.label :title %&gt;
+        &lt;%= task.text_field :title %&gt; &lt;br&gt;
+        &lt;%= task.label :due_date %&gt;
+        &lt;%= task.date_field :due_date %&gt; &lt;br&gt;
+    &lt;% end %&gt;
+
+    &lt;%= f.submit %&gt;
+&lt;% end %&gt;
+</span></code></pre></div></div>
+
+<p>The Projects controller:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ProjectsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+	<span class="o">...</span>
+    <span class="k">def</span> <span class="nf">new</span>
+        <span class="vi">@project</span> <span class="o">=</span> <span class="no">Project</span><span class="p">.</span><span class="nf">new</span>
+        <span class="vi">@project</span><span class="p">.</span><span class="nf">tasks</span><span class="p">.</span><span class="nf">build</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">create</span>
+        <span class="vi">@project</span> <span class="o">=</span> <span class="no">Project</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">project_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="vi">@project</span><span class="p">.</span><span class="nf">save</span>
+            <span class="n">flash</span><span class="p">[</span><span class="ss">:success</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Your project was created."</span>
+            <span class="n">redirect_to</span> <span class="n">project_path</span><span class="p">(</span><span class="vi">@project</span><span class="p">)</span>
+        <span class="k">else</span>
+            <span class="n">flash</span><span class="p">[</span><span class="ss">:error</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Something went wrong! Please try again."</span>
+            <span class="n">redirect_to</span> <span class="n">new_project_path</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+	<span class="o">...</span>
+	<span class="kp">private</span>
+	
+    <span class="k">def</span> <span class="nf">project_params</span>
+        <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:project</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span>
+            <span class="ss">:title</span><span class="p">,</span>
+            <span class="ss">:private</span><span class="p">,</span>
+            <span class="ss">tasks_attributes: </span><span class="p">[</span>
+                <span class="ss">:user_id</span><span class="p">,</span>
+                <span class="ss">:title</span><span class="p">,</span>
+                <span class="ss">:due_date</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>The models:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Project</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+    <span class="n">has_many</span> <span class="ss">:tasks</span>
+    <span class="n">accepts_nested_attributes_for</span> <span class="ss">:tasks</span>
+    <span class="n">has_many</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">through: :tasks</span>
+    <span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">as: :commentable</span>
+    
+    <span class="n">validates</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+    <span class="n">validates</span> <span class="ss">:private</span><span class="p">,</span> <span class="ss">inclusion: </span><span class="p">[</span><span class="kp">true</span><span class="p">,</span> <span class="kp">false</span><span class="p">]</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Task</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+    <span class="n">belongs_to</span> <span class="ss">:user</span>
+    <span class="n">belongs_to</span> <span class="ss">:project</span>
+    <span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">as: :commentable</span>
+
+    <span class="n">validates</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:user_id</span><span class="p">,</span> <span class="ss">:project_id</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+    <span class="n">validates</span> <span class="ss">:completed</span><span class="p">,</span> <span class="ss">inclusion: </span><span class="p">[</span><span class="kp">true</span><span class="p">,</span> <span class="kp">false</span><span class="p">]</span>
+    <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>So, what happens here is the Projects controller creates a new blank Project, then builds a new blank Task on that Project before sending everything over to the template where the logged in User can create a new Project and Task. Then, thanks to <code class="language-plaintext highlighter-rouge">accepts_nested_attributes_for</code> in our Project model, and the Task relevant strong params in our Projects Controller, a new Project and Task should be created and saved to the database, right?</p>
+
+<p>Unfortunately, the “Something went wrong!” message is displayed to the User. If we <code class="language-plaintext highlighter-rouge">pry</code> into the error messages for our <code class="language-plaintext highlighter-rouge">@project</code> variable, we see this…</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pry(#&lt;ProjectsController&gt;)&gt; @project.errors.messages
+=&gt; {:"tasks.project_id"=&gt;["can't be blank"]}
+</code></pre></div></div>
+
+<p>What seems to be happening here is that ActiveRecord wants to check all of the validations before it goes to the database to save the information about these two new objects. When it runs the validations for a Task, it finds that there is no <code class="language-plaintext highlighter-rouge">:project_id</code>, because the Project object hasn’t been saved yet either. At this point, it cancels the entire transaction, and we get neither a new Project, nor a new Task.</p>
+
+<p>According to my research, since the release of Rails 5, <code class="language-plaintext highlighter-rouge">belongs_to</code> automatically validates for the presence of a parent object when saving a child object to the database. Since we have built our child object on the parent, the additional validation becomes obsolete, and in the case of validating for the presence of an ID, problematic.</p>
+
+<p>So the Task model that we end up with looks like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Task</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+    <span class="n">belongs_to</span> <span class="ss">:user</span>
+    <span class="n">belongs_to</span> <span class="ss">:project</span>
+    <span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">as: :commentable</span>
+
+    <span class="n">validates</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+    <span class="n">validates</span> <span class="ss">:completed</span><span class="p">,</span> <span class="ss">inclusion: </span><span class="p">[</span><span class="kp">true</span><span class="p">,</span> <span class="kp">false</span><span class="p">]</span>
+    <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Notice that in addition to removing the validation for <code class="language-plaintext highlighter-rouge">:project_id</code>, we can now also remove the <code class="language-plaintext highlighter-rouge">:user_id</code> validation, as that is also taken care of by <code class="language-plaintext highlighter-rouge">belongs_to :user</code> in the model.</p>
+
+<p>The moral of the story, or at the very least, my takeaway, is that more is not always better when it comes to validations. In an attempt to be thorough, I ended up disregarding the built in validations and causing myself trouble down the road. Always be sure to <a href="https://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-belongs_to">check out the docs</a> for what code is generated for you by your ActiveRecord macros and other Rails generated code as to avoid unexpected behavior.</p>
+:ET
