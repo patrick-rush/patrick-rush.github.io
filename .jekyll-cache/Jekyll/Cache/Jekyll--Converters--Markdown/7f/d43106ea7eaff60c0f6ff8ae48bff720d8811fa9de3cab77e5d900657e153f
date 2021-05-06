@@ -1,0 +1,28 @@
+I"F<p>One of the very first things I did when I started learning how to build applications with React was run <code class="language-plaintext highlighter-rouge">create-react-app</code>. Then I sat back and watched as my terminal worked some magic and then voila!, out came a fresh React app, ready to be molded into my new idea. At that point, I was a bit too excited about getting in there and building something to really spend time figuring out what exactly <code class="language-plaintext highlighter-rouge">create-react-app</code> did for me, but when it came time to build more applications, I began to wonder, what exactly was going on under the hood?</p>
+
+<p>The answer is a lot. There are all kinds of things that go into creating a web application: package managers, bundlers, compilers, linters, testing suites, and the list goes on. When you go to create a web application using the React JavaScript library (and many other frameworks as well), you could certainly do so by individually creating the necessary files, installing the required components, and filling in all of the requisite boilerplate, but thankfully, you don’t have to! There are tools designed to do just this.</p>
+
+<p>In the React documentation, you will see these tools called Toolchains. A toolchain is a collection of tools that bootstrap an application for you in order to allow you to skip straight to the things that are more specific to the application you are trying to build. Create React App is the toolchain that is often recommended to React newbies. It is a good place to start learning about React and is perfect for building single-page applications, according to the React docs.</p>
+
+<p>Let’s dive into exactly what you get when you use the Create React App toolchain.</p>
+
+<h3 id="directory-structure">Directory Structure</h3>
+
+<p>First off, you get a basic directory structure that consists of a package directory, a public folder for static files, an application root directory filled with the necessary application components and utility files, and a few other files in the application directory such as a README.md. Not all of the files included in the directory structure are strictly necessary, and some pruning may be in order to trim the app down to the files necessary for the specific application, but this alone can save a good deal of time that would be necessary to build the file structure needed for a React application.</p>
+
+<h3 id="bundling-and-transpiling">Bundling and Transpiling</h3>
+
+<p>Webpack is a module bundler that parses through the entire application and creates a dependency graph that it then uses to start a development server that is live and interactive. As code changes in the editor, the app running in the browser automatically reflects that change. Babel is a transpiler (think of it as a translator for programming languages) used by Webpack to turn source code into something that can be understood by a wide range of browsers more easily, avoiding issues with compatibility. The development server can be run using the command <code class="language-plaintext highlighter-rouge">yarn start</code> or <code class="language-plaintext highlighter-rouge">npm start</code>. Create React App also handles creating a production environment using <code class="language-plaintext highlighter-rouge">yarn build</code> or <code class="language-plaintext highlighter-rouge">npm run build</code> which creates a build folder and an optimized version of your code.</p>
+
+<h3 id="linting">Linting</h3>
+
+<p>Create React App includes ESLint for making errors apparent during development.</p>
+
+<h3 id="testing">Testing</h3>
+
+<p>The Jest testing framework is included when using Create React App. Jest is designed to work out of the box as a testing framework for React apps, and can be run by using the command <code class="language-plaintext highlighter-rouge">yarn test</code> or <code class="language-plaintext highlighter-rouge">npm run test</code>.</p>
+
+<p>This is the core of Create React App, though there are many smaller pieces and packages that are included as well.</p>
+
+<p>If you are just starting out with React, or you are creating a single-page application, Create React App is an excellent way to get started. Check out the documentation here and then run <code class="language-plaintext highlighter-rouge">npx create-react-app your-app-name</code> in the directory of your choice!</p>
+:ET
