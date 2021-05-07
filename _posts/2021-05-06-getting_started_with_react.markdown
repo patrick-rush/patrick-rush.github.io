@@ -5,7 +5,7 @@ date:       2021-05-05 10:00:00 +0000
 permalink:  getting_started_with_react
 ---
 
-![create-react-app](https://i.imgur.com/QnKni4J.png)
+![create-react-app](https://i.imgur.com/gZCFKnK.png)
 
 The very first thing I did when I started learning how to build applications with React was run `create-react-app`. Then I sat back and watched as my terminal worked some magic and then voila!, out came a fresh React app, ready to be molded into my new idea. At that point, I was a bit too excited about getting in there and building something to really spend time figuring out what exactly `create-react-app` did for me, but when it came time to build more applications, I began to wonder, what exactly was going on under the hood?
 
