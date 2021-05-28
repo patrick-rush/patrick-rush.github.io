@@ -5,8 +5,6 @@ date:       2021-05-23 10:00:00 +0000
 permalink:  react_state_nested_objects
 ---
 
-# React Component Initial State for Nested Objects
-
 At least a few times in my life, I have been tripped up by the situation I’m about to describe, so I’m going to take this opportunity to write out what I’ve learned this time in hopes that perhaps I will save someone else a few minutes of their life (even if that person is me in three months) (I really think I have the hang of it this time).
 
 Here’s the scenario: you are building a React app that fetches data from an API. Let’s say that data is an array of nested objects representing movie theaters, the movies they are showing, and a few details about each movie. Your objects look something like this:
