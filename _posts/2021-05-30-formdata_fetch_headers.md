@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Handling Authorization When Sending FormData"
-date:       2021-05-23 10:00:00 +0000
+date:       2021-05-30 10:00:00 +0000
 permalink:  formdata_fetch_headers
 ---
 
